@@ -24,6 +24,7 @@ class MainWindow(QtWidgets.QMainWindow, ui.Ui_mainWindow):
         self.drawOnPhoto.clicked.connect(self.draw_on_photo)
 
     def take_photo(self):
+        """Function to capture a photo from the camera"""
         cam_port = 0
         cam = cv.VideoCapture(cam_port)
         result, self.image = cam.read()
@@ -41,6 +42,7 @@ class MainWindow(QtWidgets.QMainWindow, ui.Ui_mainWindow):
             show_error("Проверьте подключение камеры!")
 
     def upload_photo(self):
+        """Upload photo function"""
         file_path, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Открыть файл", "", "Изображения (*.jpg *.png)")
         if file_path:
             self.image = cv.imread(file_path)
@@ -50,12 +52,14 @@ class MainWindow(QtWidgets.QMainWindow, ui.Ui_mainWindow):
             self.label.setAlignment(Qt.AlignCenter)
 
     def show_channel(self, channel):
+        """Show a specific channel function"""
         if self.image is not None:
             cv.imshow("Image", self.image[:, :, channel])
         else:
             show_error("Сначала нужно загрузить изображение или сделать снимок!")
 
     def average_image(self):
+        """Function to average image"""
         if self.image is not None:
             widget = Form()
             widget.exec_()
@@ -65,6 +69,7 @@ class MainWindow(QtWidgets.QMainWindow, ui.Ui_mainWindow):
             show_error("Сначала нужно загрузить изображение или сделать снимок!")
 
     def gray_photo(self):
+        """Function to convert the image to grayscale"""
         if self.image is not None:
             gray_image = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
             cv.imshow("Image", gray_image)
@@ -72,6 +77,7 @@ class MainWindow(QtWidgets.QMainWindow, ui.Ui_mainWindow):
             show_error("Сначала нужно загрузить изображение или сделать снимок!")
 
     def draw_on_photo(self):
+        """Function to draw a rectangle on the image"""
         if self.image is not None:
             widget = RectangleForm()
             widget.exec_()
@@ -82,14 +88,18 @@ class MainWindow(QtWidgets.QMainWindow, ui.Ui_mainWindow):
         else:
             show_error("Сначала нужно загрузить изображение или сделать снимок!")
 
+
 class Form(QtWidgets.QDialog, ui.Ui_Dialog):
+    """Dialog for setting kernel size"""
     def __init__(self):
+        """Init function"""
         super().__init__()
         self.setupUi(self)
 
         self.pushButton.clicked.connect(self.set_kernel_size)
 
     def set_kernel_size(self):
+        """Function to set the kernel size"""
         try:
             number = int(self.textEdit.toPlainText())
             if number > 0:
@@ -100,8 +110,11 @@ class Form(QtWidgets.QDialog, ui.Ui_Dialog):
         except ValueError:
             show_error("Введите число>1!")
 
+
 class RectangleForm(QtWidgets.QDialog, ui.Ui_DialogRectangle):
+    """Dialog for setting coordinates of a rectangle"""
     def __init__(self):
+        """Init function"""
         super().__init__()
         self.setupUi(self)
         self.valid = False
@@ -109,6 +122,7 @@ class RectangleForm(QtWidgets.QDialog, ui.Ui_DialogRectangle):
         self.pushButton.clicked.connect(self.set_coordinates)
 
     def set_coordinates(self):
+        """Function to set the coordinates of the rectangle"""
         try:
             left_up = tuple(int(x) for x in (self.textEdit.toPlainText()).split())
             right_down = tuple(int(x) for x in (self.textEdit1.toPlainText()).split())
@@ -125,12 +139,15 @@ class RectangleForm(QtWidgets.QDialog, ui.Ui_DialogRectangle):
         except ValueError:
             show_error("Введите правильные значения!")
 
+
 def show_error(message):
+    """Function to show an error message"""
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Critical)
     msg.setText("Ошибка. " + message)
     msg.setWindowTitle("Ошибка")
     msg.exec_()
+
 
 if __name__ == "__main__":
     kernel_size = []
